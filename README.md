@@ -21,6 +21,11 @@ import { WebExtDevTools } from 'webext-devtools';
 const [result, exception] = await WebExtDevTools.inspectedWindow.eval('location.href');
 ```
 
+
+## License
+
+MIT
+
 ---
 
 Built by [theluckystrike](https://github.com/theluckystrike) — [zovo.one](https://zovo.one)
