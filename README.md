@@ -10,13 +10,13 @@ Promise-based wrapper for Chrome DevTools API.
 ## Installation
 
 ```bash
-npm install webext-devtools
+npm install @theluckystrike/webext-devtools
 ```
 
 ## Usage
 
 ```typescript
-import { WebExtDevTools } from 'webext-devtools';
+import { WebExtDevTools } from '@theluckystrike/webext-devtools';
 
 const [result, exception] = await WebExtDevTools.inspectedWindow.eval('location.href');
 ```
