@@ -21,7 +21,6 @@ import { WebExtDevTools } from 'webext-devtools';
 const [result, exception] = await WebExtDevTools.inspectedWindow.eval('location.href');
 ```
 
-
 ## License
 
 MIT
