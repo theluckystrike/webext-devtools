@@ -1,5 +1,5 @@
 [![CI](https://github.com/theluckystrike/webext-devtools/actions/workflows/ci.yml/badge.svg)](https://github.com/theluckystrike/webext-devtools/actions)
-[![npm](https://img.shields.io/npm/v/@theluckystrike/webext-devtools)](https://www.npmjs.com/package/@theluckystrike/webext-devtools)
+[![npm](https://img.shields.io/npm/v/@zovo/webext-devtools)](https://www.npmjs.com/package/@zovo/webext-devtools)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
 
@@ -21,7 +21,7 @@
 ## Installation
 
 ```bash
-npm install @theluckystrike/webext-devtools
+npm install @zovo/webext-devtools
 ```
 
 ## Quick Start
@@ -31,7 +31,7 @@ npm install @theluckystrike/webext-devtools
 Execute JavaScript in the context of the page currently open in the Chrome DevTools:
 
 ```typescript
-import { WebExtDevTools } from '@theluckystrike/webext-devtools';
+import { WebExtDevTools } from '@zovo/webext-devtools';
 
 // Get the current page URL
 const [href] = await WebExtDevTools.inspectedWindow.eval('location.href');
@@ -53,7 +53,7 @@ console.log('Page data:', JSON.parse(document));
 Intercept and analyze network traffic:
 
 ```typescript
-import { WebExtDevTools } from '@theluckystrike/webext-devtools';
+import { WebExtDevTools } from '@zovo/webext-devtools';
 
 // Listen for completed network requests
 WebExtDevTools.network.onRequestFinished((request) => {
@@ -82,7 +82,7 @@ console.log('Total requests:', harLog.entries.length);
 Build custom panels integrated into Chrome DevTools:
 
 ```typescript
-import { WebExtDevTools } from '@theluckystrike/webext-devtools';
+import { WebExtDevTools } from '@zovo/webext-devtools';
 
 // Create a new DevTools panel
 const panel = await WebExtDevTools.panels.create(
@@ -99,7 +99,7 @@ console.log('Panel created:', panel.name);
 Extend the Elements panel with custom sidebar panes:
 
 ```typescript
-import { WebExtDevTools } from '@theluckystrike/webext-devtools';
+import { WebExtDevTools } from '@zovo/webext-devtools';
 
 // Create a sidebar pane in the Elements panel
 const sidebar = await WebExtDevTools.panels.elements.createSidebarPane(
@@ -122,7 +122,7 @@ sidebar.setContent('<h1>Element Details</h1><p>Custom content here</p>');
 Control page reloading from your extension:
 
 ```typescript
-import { WebExtDevTools } from '@theluckystrike/webext-devtools';
+import { WebExtDevTools } from '@zovo/webext-devtools';
 
 // Reload with custom options
 WebExtDevTools.inspectedWindow.reload({
