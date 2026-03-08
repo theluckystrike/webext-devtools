@@ -1,5 +1,5 @@
 {
-  "name": "@theluckystrike/webext-devtools",
+  "name": "@zovo/webext-devtools",
   "version": "1.0.0",
   "description": "Promise-based, typed wrapper for the Chrome DevTools Protocol API",
   "main": "./dist/index.js",
@@ -13,31 +13,32 @@
     "url": "git+https://github.com/theluckystrike/webext-devtools.git"
   },
   "keywords": [
-    "chrome-devtools",
-    "webextension",
+    "chrome-extension",
     "devtools",
+    "typescript",
+    "webextension",
     "browser-extension",
     "manifest-v3",
     "npm-package",
     "devtools-protocol"
   ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/theluckystrike/webext-devtools/issues"
   },
   "homepage": "https://github.com/theluckystrike/webext-devtools#readme",
+  "engines": {
+    "node": ">=18"
+  },
+  "sideEffects": false,
   "devDependencies": {
     "@types/chrome": "^0.1.37",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
   },
-  "engines": {
-    "node": ">=18"
-  },
   "type": "module",
   "types": "./dist/index.d.ts",
-  "sideEffects": false,
   "files": [
     "dist",
     "README.md",
