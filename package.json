@@ -1,7 +1,7 @@
 {
-  "name": "@theluckystrike/webext-devtools",
+  "name": "@zovo/webext-devtools",
   "version": "1.0.0",
-  "description": "",
+  "description": "Promise-based, fully typed wrapper for the Chrome DevTools API — panels, inspected window, network, and sidebars. Part of @zovo/webext.",
   "main": "./dist/index.js",
   "scripts": {
     "test": "vitest run",
@@ -12,17 +12,24 @@
     "type": "git",
     "url": "git+https://github.com/theluckystrike/webext-devtools.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "chrome-devtools",
+    "chrome-extension",
+    "browser-extension",
+    "devtools",
+    "devtools-protocol",
+    "manifest-v3",
+    "webextension",
+    "npm-package"
+  ],
+  "author": "theluckystrike",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/theluckystrike/webext-devtools/issues"
   },
   "homepage": "https://github.com/theluckystrike/webext-devtools#readme",
-  "devDependencies": {
-    "@types/chrome": "^0.1.37",
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.18"
+  "engines": {
+    "node": ">=18.0.0"
   },
   "type": "module",
   "types": "./dist/index.d.ts",
@@ -31,11 +38,16 @@
     "README.md",
     "LICENSE"
   ],
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     }
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
   }
 }
