@@ -12,9 +12,24 @@
     "type": "git",
     "url": "git+https://github.com/theluckystrike/webext-devtools.git"
   },
-  "keywords": [],
+  "keywords": [
+    "browser-extension",
+    "chrome-devtools",
+    "chrome-devtools-api",
+    "chrome-extension",
+    "devtools",
+    "devtools-protocol",
+    "manifest-v3",
+    "npm-package",
+    "typescript",
+    "webextension"
+  ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "sideEffects": false,
   "bugs": {
     "url": "https://github.com/theluckystrike/webext-devtools/issues"
   },
