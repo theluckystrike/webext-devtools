@@ -1,7 +1,7 @@
 {
   "name": "@theluckystrike/webext-devtools",
   "version": "1.0.0",
-  "description": "",
+  "description": "Promise-based wrapper for the Chrome DevTools API. Part of @zovo/webext.",
   "main": "./dist/index.js",
   "scripts": {
     "test": "vitest run",
@@ -12,9 +12,21 @@
     "type": "git",
     "url": "git+https://github.com/theluckystrike/webext-devtools.git"
   },
-  "keywords": [],
+  "keywords": [
+    "chrome-extension",
+    "devtools",
+    "chrome-devtools",
+    "typescript",
+    "webextension",
+    "browser-extension",
+    "manifest-v3",
+    "har",
+    "network",
+    "inspector",
+    "promise"
+  ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/theluckystrike/webext-devtools/issues"
   },
