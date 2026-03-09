@@ -1,104 +1,134 @@
 [![CI](https://github.com/theluckystrike/webext-devtools/actions/workflows/ci.yml/badge.svg)](https://github.com/theluckystrike/webext-devtools/actions)
-[![npm](https://img.shields.io/npm/v/@theluckystrike/webext-devtools)](https://www.npmjs.com/package/@theluckystrike/webext-devtools)
+[![npm](https://img.shields.io/npm/v/@zovo/webext-devtools)](https://www.npmjs.com/package/@zovo/webext-devtools)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
-[![npm bundle size](https://img.shields.io/bundlephobia/minzip/@theluckystrike/webext-devtools)](https://bundlephobia.com/package/@theluckystrike/webext-devtools)
 
 # webext-devtools
 
 > Promise-based, typed wrapper for the Chrome DevTools Protocol API
 
-A modern, TypeScript-first library that provides promise-based wrappers around the Chrome DevTools Protocol APIs. Simplifies building Chrome DevTools extensions by converting callback-based APIs to clean, awaitable promises.
+`webext-devtools` provides a clean, promise-based API for interacting with Chrome's DevTools Protocol from browser extensions. Built with TypeScript for full type safety and intellisense.
 
 ## Features
 
-- **Inspected Window Evaluation** — Execute JavaScript in the context of the inspected page with full TypeScript support
-- **Network Request Interception** — Monitor and analyze network requests using HAR logs and request callbacks
-- **Panel Creation** — Create custom DevTools panels with ease
+- **Inspected Window Evaluation** — Execute JavaScript in the context of the inspected page with proper Promise semantics
+- **Network Request Interception** — Hook into network request events and access HAR logs
+- **Panel Creation** — Programmatically create DevTools panels with icons and custom pages
 - **Sidebar Management** — Add custom sidebars to the Elements panel
 - **Full TypeScript Support** — Complete type definitions for all APIs
+- **Zero Dependencies** — Lightweight, minimal footprint
 
 ## Installation
 
 ```bash
-npm install @theluckystrike/webext-devtools
-# or
-pnpm add @theluckystrike/webext-devtools
-# or
-yarn add @theluckystrike/webext-devtools
+npm install @zovo/webext-devtools
 ```
 
 ## Quick Start
 
-### Evaluate Code in Inspected Page
+### 1. Evaluate Code in the Inspected Page
+
+Execute JavaScript in the context of the page currently open in the Chrome DevTools:
 
 ```typescript
-import { WebExtDevTools } from '@theluckystrike/webext-devtools';
+import { WebExtDevTools } from '@zovo/webext-devtools';
 
-// Execute JavaScript in the context of the inspected page
-const [result, exception] = await WebExtDevTools.inspectedWindow.eval(
-  'document.title'
-);
+// Get the current page URL
+const [href] = await WebExtDevTools.inspectedWindow.eval('location.href');
+console.log('Current page:', href);
 
-if (!exception) {
-  console.log('Page title:', result);
-}
+// Evaluate more complex expressions
+const [document] = await WebExtDevTools.inspectedWindow.eval(`
+  JSON.stringify({
+    title: document.title,
+    forms: document.forms.length,
+    scripts: document.scripts.length
+  })
+`);
+console.log('Page data:', JSON.parse(document));
 ```
 
-### Create a DevTools Panel
+### 2. Monitor Network Requests
+
+Intercept and analyze network traffic:
 
 ```typescript
-import { WebExtDevTools } from '@theluckystrike/webext-devtools';
+import { WebExtDevTools } from '@zovo/webext-devtools';
 
-// Create a custom DevTools panel
-const panel = await WebExtDevTools.panels.create(
-  'My Panel',
-  'images/panel-icon.png',
-  'panel.html'
-);
-
-// Listen for panel visibility changes
-panel.onShown.addListener((window) => {
-  console.log('Panel is now visible');
-});
-```
-
-### Monitor Network Requests
-
-```typescript
-import { WebExtDevTools } from '@theluckystrike/webext-devtools';
-
-// Listen for all finished network requests
+// Listen for completed network requests
 WebExtDevTools.network.onRequestFinished((request) => {
   console.log('Request URL:', request.request.url);
-  console.log('Response status:', request.response.status);
+  console.log('Method:', request.request.method);
+  console.log('Status:', request.response.status);
   
   // Get request post data
-  request.getPostData((postData) => {
-    console.log('Post data:', postData);
+  request.getContent((content, encoding) => {
+    console.log('Response body:', content);
   });
 });
 
-// Get HAR log containing all network requests
+// Listen for page navigations
+WebExtDevTools.network.onNavigated((url) => {
+  console.log('Navigated to:', url);
+});
+
+// Get HAR log of all network requests
 const harLog = await WebExtDevTools.network.getHAR();
 console.log('Total requests:', harLog.entries.length);
 ```
 
-### Add Sidebar to Elements Panel
+### 3. Create DevTools Panels
+
+Build custom panels integrated into Chrome DevTools:
 
 ```typescript
-import { WebExtDevTools } from '@theluckystrike/webext-devtools';
+import { WebExtDevTools } from '@zovo/webext-devtools';
+
+// Create a new DevTools panel
+const panel = await WebExtDevTools.panels.create(
+  'My Extension Panel',  // Panel title
+  'images/icon.png',     // Panel icon
+  'panel.html'          // Panel page
+);
+
+console.log('Panel created:', panel.name);
+```
+
+### 4. Add Sidebars to the Elements Panel
+
+Extend the Elements panel with custom sidebar panes:
+
+```typescript
+import { WebExtDevTools } from '@zovo/webext-devtools';
 
 // Create a sidebar pane in the Elements panel
 const sidebar = await WebExtDevTools.panels.elements.createSidebarPane(
-  'My Custom Sidebar'
+  'My Sidebar'
 );
 
-// Set sidebar content
-sidebar.setObject({ 
-  title: 'Element Info',
-  selected: true,
-  children: 3 
+// Set the sidebar content
+sidebar.setObject({
+  nodeType: 'element',
+  tagName: 'div',
+  id: 'app'
+});
+
+// Or set HTML content
+sidebar.setContent('<h1>Element Details</h1><p>Custom content here</p>');
+```
+
+### 5. Reload the Inspected Page
+
+Control page reloading from your extension:
+
+```typescript
+import { WebExtDevTools } from '@zovo/webext-devtools';
+
+// Reload with custom options
+WebExtDevTools.inspectedWindow.reload({
+  ignoreCache: true,
+  userAgent: 'Custom Agent',
+  injectedScript: 'console.log("Injected!")'
 });
 ```
 
@@ -108,51 +138,52 @@ sidebar.setObject({
 
 | Method | Signature | Description |
 |--------|-----------|-------------|
-| `eval` | `(expression: string, options?: EvalOptions) => Promise<[any, DevToolsException]>` | Evaluates a JavaScript expression in the context of the inspected page |
-| `reload` | `(reloadOptions?: ReloadOptions) => void` | Reloads the inspected window |
+| `eval` | `(expression: string, options?: EvalOptions) => Promise<[any, any]>` | Evaluates JavaScript in the inspected page. Returns `[result, exception]`. |
+| `reload` | `(reloadOptions?: ReloadOptions) => void` | Reloads the inspected page with optional settings. |
 
 ### `WebExtDevTools.network`
 
 | Method | Signature | Description |
 |--------|-----------|-------------|
-| `getHAR` | `() => Promise<HARLog>` | Returns HAR log containing all known network requests |
-| `onRequestFinished` | `(callback: (request: Request) => void) => void` | Fired when a network request finishes |
-| `onNavigated` | `(callback: (url: string) => void) => void` | Fired when the inspected window navigates |
+| `getHAR` | `() => Promise<HARLog>` | Returns HAR log containing all known network requests. |
+| `onRequestFinished` | `(callback: (request: Request) => void) => void` | Registers a listener for completed network requests. |
+| `onNavigated` | `(callback: (url: string) => void) => void` | Registers a listener for page navigation events. |
 
 ### `WebExtDevTools.panels`
 
 | Method | Signature | Description |
 |--------|-----------|-------------|
-| `create` | `(title: string, iconPath: string, pagePath: string) => Promise<ExtensionPanel>` | Creates a DevTools panel |
+| `create` | `(title: string, iconPath: string, pagePath: string) => Promise<ExtensionPanel>` | Creates a new DevTools panel. |
 
 ### `WebExtDevTools.panels.elements`
 
 | Method | Signature | Description |
 |--------|-----------|-------------|
-| `createSidebarPane` | `(title: string) => Promise<ExtensionSidebarPane>` | Creates a sidebar pane in the Elements panel |
+| `createSidebarPane` | `(title: string) => Promise<ExtensionSidebarPane>` | Creates a sidebar pane in the Elements panel. |
 
-## Permissions
+## Required Permissions
 
-To use this library, your extension needs the `devtools` permission in `manifest.json`:
+To use `webext-devtools`, your extension must declare the `devtools` permission in `manifest.json`:
 
 ```json
 {
-  "name": "My DevTools Extension",
-  "version": "1.0.0",
   "manifest_version": 3,
+  "name": "My Extension",
   "permissions": [
     "devtools"
   ]
 }
 ```
 
+The `devtools` permission is required to access the `chrome.devtools` API. No additional permissions are needed for basic usage.
+
 ## Part of @zovo/webext
 
-`webext-devtools` is part of the `@zovo/webext` ecosystem — a collection of modern, promise-based wrappers for Web Extension APIs.
+`webext-devtools` is part of the `@zovo/webext` family of packages, providing modular utilities for building modern browser extensions:
 
-- [@zovo/webext-runtime](https://github.com/theluckystrike/webext-runtime) — chrome.runtime API
-- [@zovo/webext-tabs](https://github.com/theluckystrike/webext-tabs) — chrome.tabs API
-- [@zovo/webext-storage](https://github.com/theluckystrike/webext-storage) — chrome.storage API
+- [@zovo/webext-devtools](/theluckystrike/webext-devtools) — DevTools Protocol wrapper
+- [@zovo/webext-storage](/theluckystrike/webext-storage) — Storage utilities
+- [@zovo/webext-messaging](/theluckystrike/webext-messaging) — Cross-context messaging
 
 ## License
 
