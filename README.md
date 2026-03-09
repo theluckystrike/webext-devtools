@@ -1,117 +1,163 @@
-<div align="center">
-
-# @theluckystrike/webext-devtools
-
-Promise-based wrapper for the Chrome DevTools API. Inspect windows, monitor network requests, and create custom panels.
-
-[![npm version](https://img.shields.io/npm/v/@theluckystrike/webext-devtools)](https://www.npmjs.com/package/@theluckystrike/webext-devtools)
-[![npm downloads](https://img.shields.io/npm/dm/@theluckystrike/webext-devtools)](https://www.npmjs.com/package/@theluckystrike/webext-devtools)
+[![CI](https://github.com/theluckystrike/webext-devtools/actions/workflows/ci.yml/badge.svg)](https://github.com/theluckystrike/webext-devtools/actions)
+[![npm](https://img.shields.io/npm/v/@theluckystrike/webext-devtools)](https://www.npmjs.com/package/@theluckystrike/webext-devtools)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
-![npm bundle size](https://img.shields.io/bundlephobia/minzip/@theluckystrike/webext-devtools)
+[![npm bundle size](https://img.shields.io/bundlephobia/minzip/@theluckystrike/webext-devtools)](https://bundlephobia.com/package/@theluckystrike/webext-devtools)
 
-[Installation](#installation) · [Quick Start](#quick-start) · [API](#api) · [License](#license)
+# webext-devtools
 
-</div>
+> Promise-based, typed wrapper for the Chrome DevTools Protocol API
 
----
+A modern, TypeScript-first library that provides promise-based wrappers around the Chrome DevTools Protocol APIs. Simplifies building Chrome DevTools extensions by converting callback-based APIs to clean, awaitable promises.
 
 ## Features
 
-- **Inspected window** -- evaluate expressions in the inspected page
-- **Network API** -- get HAR logs and monitor network requests
-- **Panels API** -- create custom DevTools panels and sidebar panes
-- **Promise-based** -- async/await instead of callbacks
-- **Typed** -- full TypeScript support for all DevTools APIs
-- **Zero dependencies** -- just TypeScript and Chrome APIs
+- **Inspected Window Evaluation** — Execute JavaScript in the context of the inspected page with full TypeScript support
+- **Network Request Interception** — Monitor and analyze network requests using HAR logs and request callbacks
+- **Panel Creation** — Create custom DevTools panels with ease
+- **Sidebar Management** — Add custom sidebars to the Elements panel
+- **Full TypeScript Support** — Complete type definitions for all APIs
 
 ## Installation
 
 ```bash
 npm install @theluckystrike/webext-devtools
-```
-
-<details>
-<summary>Other package managers</summary>
-
-```bash
+# or
 pnpm add @theluckystrike/webext-devtools
 # or
 yarn add @theluckystrike/webext-devtools
 ```
 
-</details>
-
 ## Quick Start
 
+### Evaluate Code in Inspected Page
+
 ```typescript
-import { WebExtDevTools } from "@theluckystrike/webext-devtools";
+import { WebExtDevTools } from '@theluckystrike/webext-devtools';
 
-// Evaluate in inspected page
-const [result, exception] = await WebExtDevTools.inspectedWindow.eval("document.title");
+// Execute JavaScript in the context of the inspected page
+const [result, exception] = await WebExtDevTools.inspectedWindow.eval(
+  'document.title'
+);
 
-// Get HAR log
-const har = await WebExtDevTools.network.getHAR();
+if (!exception) {
+  console.log('Page title:', result);
+}
+```
 
-// Create a custom panel
-const panel = await WebExtDevTools.panels.create("My Panel", "icon.png", "panel.html");
+### Create a DevTools Panel
 
-// Monitor network requests
-WebExtDevTools.network.onRequestFinished((request) => {
-  console.log(request.request.url);
+```typescript
+import { WebExtDevTools } from '@theluckystrike/webext-devtools';
+
+// Create a custom DevTools panel
+const panel = await WebExtDevTools.panels.create(
+  'My Panel',
+  'images/panel-icon.png',
+  'panel.html'
+);
+
+// Listen for panel visibility changes
+panel.onShown.addListener((window) => {
+  console.log('Panel is now visible');
 });
 ```
 
-## API
+### Monitor Network Requests
 
-| Namespace | Method | Description |
-|-----------|--------|-------------|
-| `inspectedWindow` | `eval(expr, opts?)` | Evaluate JS in the inspected page |
-| `inspectedWindow` | `reload(opts?)` | Reload the inspected page |
-| `network` | `getHAR()` | Get full HAR log |
-| `network` | `onRequestFinished(cb)` | Listen for completed requests |
-| `network` | `onNavigated(cb)` | Listen for page navigations |
-| `panels` | `create(title, icon, page)` | Create a DevTools panel |
-| `panels.elements` | `createSidebarPane(title)` | Create an Elements sidebar pane |
+```typescript
+import { WebExtDevTools } from '@theluckystrike/webext-devtools';
+
+// Listen for all finished network requests
+WebExtDevTools.network.onRequestFinished((request) => {
+  console.log('Request URL:', request.request.url);
+  console.log('Response status:', request.response.status);
+  
+  // Get request post data
+  request.getPostData((postData) => {
+    console.log('Post data:', postData);
+  });
+});
+
+// Get HAR log containing all network requests
+const harLog = await WebExtDevTools.network.getHAR();
+console.log('Total requests:', harLog.entries.length);
+```
+
+### Add Sidebar to Elements Panel
+
+```typescript
+import { WebExtDevTools } from '@theluckystrike/webext-devtools';
+
+// Create a sidebar pane in the Elements panel
+const sidebar = await WebExtDevTools.panels.elements.createSidebarPane(
+  'My Custom Sidebar'
+);
+
+// Set sidebar content
+sidebar.setObject({ 
+  title: 'Element Info',
+  selected: true,
+  children: 3 
+});
+```
+
+## API Reference
+
+### `WebExtDevTools.inspectedWindow`
+
+| Method | Signature | Description |
+|--------|-----------|-------------|
+| `eval` | `(expression: string, options?: EvalOptions) => Promise<[any, DevToolsException]>` | Evaluates a JavaScript expression in the context of the inspected page |
+| `reload` | `(reloadOptions?: ReloadOptions) => void` | Reloads the inspected window |
+
+### `WebExtDevTools.network`
+
+| Method | Signature | Description |
+|--------|-----------|-------------|
+| `getHAR` | `() => Promise<HARLog>` | Returns HAR log containing all known network requests |
+| `onRequestFinished` | `(callback: (request: Request) => void) => void` | Fired when a network request finishes |
+| `onNavigated` | `(callback: (url: string) => void) => void` | Fired when the inspected window navigates |
+
+### `WebExtDevTools.panels`
+
+| Method | Signature | Description |
+|--------|-----------|-------------|
+| `create` | `(title: string, iconPath: string, pagePath: string) => Promise<ExtensionPanel>` | Creates a DevTools panel |
+
+### `WebExtDevTools.panels.elements`
+
+| Method | Signature | Description |
+|--------|-----------|-------------|
+| `createSidebarPane` | `(title: string) => Promise<ExtensionSidebarPane>` | Creates a sidebar pane in the Elements panel |
 
 ## Permissions
 
-Requires a `devtools_page` entry in your manifest:
+To use this library, your extension needs the `devtools` permission in `manifest.json`:
 
 ```json
-{ "devtools_page": "devtools.html" }
+{
+  "name": "My DevTools Extension",
+  "version": "1.0.0",
+  "manifest_version": 3,
+  "permissions": [
+    "devtools"
+  ]
+}
 ```
 
 ## Part of @zovo/webext
 
-This package is part of the [@zovo/webext](https://github.com/theluckystrike) family -- typed, modular utilities for Chrome extension development:
+`webext-devtools` is part of the `@zovo/webext` ecosystem — a collection of modern, promise-based wrappers for Web Extension APIs.
 
-| Package | Description |
-|---------|-------------|
-| [webext-storage](https://github.com/theluckystrike/webext-storage) | Typed storage with schema validation |
-| [webext-messaging](https://github.com/theluckystrike/webext-messaging) | Type-safe message passing |
-| [webext-tabs](https://github.com/theluckystrike/webext-tabs) | Tab query helpers |
-| [webext-cookies](https://github.com/theluckystrike/webext-cookies) | Promise-based cookies API |
-| [webext-i18n](https://github.com/theluckystrike/webext-i18n) | Internationalization toolkit |
-
-## Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+- [@zovo/webext-runtime](https://github.com/theluckystrike/webext-runtime) — chrome.runtime API
+- [@zovo/webext-tabs](https://github.com/theluckystrike/webext-tabs) — chrome.tabs API
+- [@zovo/webext-storage](https://github.com/theluckystrike/webext-storage) — chrome.storage API
 
 ## License
 
-MIT License -- see [LICENSE](LICENSE) for details.
+MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
-<div align="center">
-
-Built by [theluckystrike](https://github.com/theluckystrike) · [zovo.one](https://zovo.one)
-
-</div>
+Built by [theluckystrike](https://github.com/theluckystrike) — [zovo.one](https://zovo.one)
